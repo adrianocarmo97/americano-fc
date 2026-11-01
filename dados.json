@@ -483,18 +483,6 @@
    "canc": false
   },
   {
-   "as": 0,
-   "away": "DESP.RINCONENSE",
-   "date": "2026-11-07",
-   "home": "Americano FC",
-   "hs": 5,
-   "id": "zxf58h8",
-   "local": "AFC",
-   "scorers": [],
-   "time": "",
-   "canc": false
-  },
-  {
    "as": null,
    "away": "INTERNACIONAL",
    "date": "2026-11-14",
@@ -548,6 +536,17 @@
    "local": "AFC",
    "scorers": [],
    "time": ""
+  },
+  {
+   "id": "ixo456q",
+   "date": "2026-11-07",
+   "time": "16:00",
+   "home": "Americano FC",
+   "away": "DESP.RINCONENSE",
+   "local": "AFC",
+   "hs": null,
+   "as": null,
+   "scorers": []
   }
  ]
 }
