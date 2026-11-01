@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#d92323">
+<link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Americano FC">
@@ -54,9 +55,17 @@ td.g{font-weight:700;color:var(--ac);text-align:center;font-size:18px}
 .em{text-align:center;color:var(--mu);padding:28px 8px}
 .hint{font-size:12px;color:var(--mu);margin-top:6px}
 .warn{color:var(--dn)}
-#inst{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:20;max-width:696px;margin:0 auto;background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--rd);border-radius:14px;padding:12px 14px;box-shadow:0 6px 24px rgba(0,0,0,.28)}
+#inst{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:20;max-width:696px;margin:0 auto;background:#0f1923;border:1px solid #223140;border-radius:18px;padding:14px 16px 16px;box-shadow:0 10px 32px rgba(0,0,0,.45);color:#f1f5f9;animation:instUp .35s ease-out}
+@keyframes instUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 #inst[hidden]{display:none}
-#inst b{display:block}#inst p{margin:4px 0 0;font-size:14px;color:var(--mu)}
+#inst .ih{display:flex;align-items:center;gap:14px}
+#inst .ic{flex:none;width:44px;height:44px;border-radius:12px;background:#22c55e;display:flex;align-items:center;justify-content:center}
+#inst .it{flex:1;min-width:0}
+#inst .it b{display:block;font-size:16px;color:#f1f5f9}
+#inst .it p{margin:2px 0 0;font-size:14px;line-height:1.35;color:#94a3b8}
+#inst .ix{flex:none;align-self:flex-start;background:none;border:0;padding:4px;cursor:pointer;color:#94a3b8;line-height:0}
+#inst .ig{margin-top:12px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 16px;border-radius:12px;border:1px solid rgba(34,197,94,.45);background:rgba(34,197,94,.12);color:#22c55e;font-weight:700;font-size:16px;cursor:pointer}
+#inst .ig:active{background:rgba(34,197,94,.22)}
 </style>
 </head>
 <body>
@@ -68,7 +77,7 @@ td.g{font-weight:700;color:var(--ac);text-align:center;font-size:18px}
   <button class="tab" data-tab="art">Artilheiros</button>
 </div>
 <div id="app"></div>
-<div id="inst" hidden role="dialog" aria-label="Instalar aplicativo"><b>📲 Instale o app do Americano FC</b><p id="inst-t"></p><div class="act"><button class="btn p" id="inst-go" hidden>Instalar</button><button class="btn" id="inst-no">Agora não</button></div></div>
+<div id="inst" hidden role="dialog" aria-label="Instalar aplicativo"><div class="ih"><div class="ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f1923" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><circle cx="5" cy="6" r="1.8"/><circle cx="19" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="18" r="1.8"/><path d="M10.2 10.6 6.4 7.2M13.8 10.6l3.8-3.4M10.2 13.4l-3.8 3.4M13.8 13.4l3.8 3.4"/></svg></div><div class="it"><b>Instale o aplicativo</b><p id="inst-t">Abre em tela cheia, direto do ícone, e carrega mais rápido em campo.</p></div><button class="ix" id="inst-no" aria-label="Fechar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><button class="ig" id="inst-go"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Instalar aplicativo</button></div>
 <datalist id="players"></datalist>
 </main>
 <script>
@@ -262,16 +271,19 @@ init();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!ADMIN&&!editing)init()});
 (function(){
   const box=$('#inst'),txt=$('#inst-t'),go=$('#inst-go'),no=$('#inst-no');
+  const DEF=txt.textContent;
   if(matchMedia('(display-mode: standalone)').matches||navigator.standalone)return;
-  try{if(localStorage.getItem('inst-off')==='1')return}catch(e){}
+  try{const t=+localStorage.getItem('inst-off');if(t&&Date.now()-t<7*864e5)return}catch(e){}
   const ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),and=/android/i.test(ua);
   let dp=null;
-  if(ios){txt.textContent='Toque no botão Compartilhar do Safari e depois em “Adicionar à Tela de Início”.';box.hidden=false}
-  else if(and){txt.textContent='Toque no menu ⋮ do navegador e depois em “Instalar app” ou “Adicionar à tela inicial”.';box.hidden=false}
-  addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;txt.textContent='Instale o app para abrir mais rápido, direto da tela inicial.';go.hidden=false;box.hidden=false});
+  if(ios||and)box.hidden=false;
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;box.hidden=false});
   addEventListener('appinstalled',()=>{box.hidden=true});
-  go.onclick=async()=>{if(!dp)return;dp.prompt();try{await dp.userChoice}catch(e){}dp=null;box.hidden=true};
-  no.onclick=()=>{box.hidden=true;try{localStorage.setItem('inst-off','1')}catch(e){}};
+  go.onclick=async()=>{
+    if(dp){dp.prompt();try{await dp.userChoice}catch(e){}dp=null;box.hidden=true;return}
+    txt.textContent=ios?'Toque em Compartilhar (quadrado com seta) no Safari e depois em “Adicionar à Tela de Início”.':'Toque no menu ⋮ do navegador e depois em “Instalar app” ou “Adicionar à tela inicial”.';
+  };
+  no.onclick=()=>{box.hidden=true;try{localStorage.setItem('inst-off',String(Date.now()))}catch(e){}};
 })();
 </script>
 </body>
